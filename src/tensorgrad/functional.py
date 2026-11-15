@@ -139,8 +139,9 @@ def conv2d(
 
     def backward(g: np.ndarray):
         g2 = g.transpose(0, 2, 3, 1).reshape(-1, f)  # (N*OH*OW, F), same row order as cols
-        dx = col2im(g2 @ wmat, x_shape, kh, kw, stride, padding)
-        dw = (g2.T @ cols).reshape(weight.shape)
+        # Skip the expensive col2im when the input needs no gradient (e.g. the image batch).
+        dx = col2im(g2 @ wmat, x_shape, kh, kw, stride, padding) if x.requires_grad else None
+        dw = (g2.T @ cols).reshape(weight.shape) if weight.requires_grad else None
         return (dx, dw) if bias is None else (dx, dw, g2.sum(axis=0))
 
     parents = (x, weight) if bias is None else (x, weight, bias)

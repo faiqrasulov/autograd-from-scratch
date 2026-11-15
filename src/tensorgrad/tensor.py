@@ -278,13 +278,14 @@ class Tensor:
             b2 = b.data[:, None] if b.ndim == 1 else b.data
             g2 = g[..., None] if b.ndim == 1 else g  # re-insert the dropped column axis
             g2 = g2[..., None, :] if a.ndim == 1 else g2  # ... and the dropped row axis
-            ga = g2 @ np.swapaxes(b2, -1, -2)
-            gb = np.swapaxes(a2, -1, -2) @ g2
-            if a.ndim == 1:
-                ga = ga.squeeze(-2)
-            if b.ndim == 1:
-                gb = gb.squeeze(-1)
-            return unbroadcast(ga, a.shape), unbroadcast(gb, b.shape)
+            ga = gb = None
+            if a.requires_grad:
+                ga = g2 @ np.swapaxes(b2, -1, -2)
+                ga = unbroadcast(ga.squeeze(-2) if a.ndim == 1 else ga, a.shape)
+            if b.requires_grad:
+                gb = np.swapaxes(a2, -1, -2) @ g2
+                gb = unbroadcast(gb.squeeze(-1) if b.ndim == 1 else gb, b.shape)
+            return ga, gb
 
         return Tensor._make(a.data @ b.data, (a, b), backward, "matmul")
 

@@ -19,7 +19,7 @@ from .gradcheck import gradcheck
 from .tensor import Tensor
 
 
-def _torch() -> Any:
+def require_torch() -> Any:
     try:
         import torch
     except ImportError as err:  # pragma: no cover - exercised only without the extra
@@ -31,7 +31,11 @@ def _torch() -> Any:
 
 
 def _tF() -> Any:
-    return _torch().nn.functional
+    return require_torch().nn.functional
+
+
+def _ce_targets_torch() -> Any:
+    return require_torch().from_numpy(_CE_TARGETS)
 
 
 # ---------------------------------------------------------------------------- op registry
@@ -122,10 +126,10 @@ OP_CASES: list[OpCase] = [
            lambda a: F.log_softmax(a, axis=0), lambda a: a.log_softmax(dim=0)),
     OpCase("cross_entropy (mean)", _normal((5, 4)),
            lambda a: F.cross_entropy(a, _CE_TARGETS),
-           lambda a: _tF().cross_entropy(a, _torch().from_numpy(_CE_TARGETS))),
+           lambda a: _tF().cross_entropy(a, _ce_targets_torch())),
     OpCase("cross_entropy (sum)", _normal((5, 4)),
            lambda a: F.cross_entropy(a, _CE_TARGETS, reduction="sum"),
-           lambda a: _tF().cross_entropy(a, _torch().from_numpy(_CE_TARGETS), reduction="sum")),
+           lambda a: _tF().cross_entropy(a, _ce_targets_torch(), reduction="sum")),
     OpCase("conv2d (stride 1, pad 1, bias)", _normal((2, 3, 5, 5), (4, 3, 3, 3), (4,)),
            lambda x, w, b: F.conv2d(x, w, b, stride=1, padding=1),
            lambda x, w, b: _tF().conv2d(x, w, b, stride=1, padding=1)),
@@ -144,7 +148,7 @@ def compare_op(case: OpCase, seed: int = 0) -> tuple[float, float]:
 
     Returns (max |forward difference|, max |input-gradient difference|).
     """
-    torch = _torch()
+    torch = require_torch()
     rng = np.random.default_rng(seed)
     inputs = case.make_inputs(rng)
 
@@ -177,7 +181,7 @@ def op_report(seed: int = 0) -> list[dict[str, Any]]:
 # ---------------------------------------------------------------------------- model mirror
 def to_torch(model: nn.Sequential, dtype: Any = np.float64) -> Any:
     """Build the identical ``torch.nn.Sequential`` and copy every weight into it."""
-    torch = _torch()
+    torch = require_torch()
     tnn = torch.nn
     layers = []
     for layer in model:

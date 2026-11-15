@@ -46,6 +46,12 @@ class Module:
     def __call__(self, x: Tensor) -> Tensor:
         return self.forward(x)
 
+    def extra_repr(self) -> str:
+        return ""
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.extra_repr()})"
+
     def named_parameters(self, prefix: str = "") -> Iterator[tuple[str, Parameter]]:
         for name, p in self._parameters.items():
             yield prefix + name, p
@@ -119,6 +125,10 @@ class Linear(Module):
         self.weight = Parameter(kaiming_normal(shape, in_features, _rng(rng), dtype))
         self.bias = Parameter(np.zeros(out_features, dtype=dtype)) if bias else None
 
+    def extra_repr(self) -> str:
+        out_f, in_f = self.weight.shape
+        return f"{in_f}, {out_f}" + ("" if self.bias is not None else ", bias=False")
+
     def forward(self, x: Tensor) -> Tensor:
         y = x @ self.weight.T
         return y + self.bias if self.bias is not None else y
@@ -145,6 +155,10 @@ class Conv2d(Module):
         self.weight = Parameter(kaiming_normal(shape, fan_in, _rng(rng), dtype))
         self.bias = Parameter(np.zeros(out_channels, dtype=dtype)) if bias else None
 
+    def extra_repr(self) -> str:
+        f, c, k, _ = self.weight.shape
+        return f"{c}, {f}, k={k}, stride={self.stride}, pad={self.padding}"
+
     def forward(self, x: Tensor) -> Tensor:
         return F.conv2d(x, self.weight, self.bias, self.stride, self.padding)
 
@@ -153,6 +167,9 @@ class MaxPool2d(Module):
     def __init__(self, kernel_size: int, stride: int | None = None) -> None:
         super().__init__()
         self.kernel_size, self.stride = kernel_size, stride
+
+    def extra_repr(self) -> str:
+        return f"{self.kernel_size}" + (f", stride={self.stride}" if self.stride else "")
 
     def forward(self, x: Tensor) -> Tensor:
         return F.max_pool2d(x, self.kernel_size, self.stride)
@@ -183,6 +200,9 @@ class Dropout(Module):
         self.p = p
         self.rng = _rng(rng)
 
+    def extra_repr(self) -> str:
+        return f"p={self.p}"
+
     def forward(self, x: Tensor) -> Tensor:
         return F.dropout(x, self.p, self.training, self.rng)
 
@@ -203,6 +223,9 @@ class Sequential(Module):
 
     def __len__(self) -> int:
         return len(self._modules)
+
+    def __repr__(self) -> str:
+        return " -> ".join(repr(m) for m in self._modules.values())
 
     def forward(self, x: Tensor) -> Tensor:
         for layer in self._modules.values():
