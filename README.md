@@ -277,6 +277,14 @@ make test      # 149 tests, ~4 s
 make lint
 ```
 
+`make install` takes the newest compatible packages. To reproduce the committed `reports/`, use
+`make install-locked` instead: it installs the versions pinned in
+[`requirements.lock`](requirements.lock) (Python 3.12). With them `make run` gives the same accuracies
+and the same parity conclusions. Losses agree with the committed ones to 1e-6 or better; the exact
+size of the float64 parity gaps (still at the 1e-15 level) and the timings vary with the
+linear-algebra build, and the committed run used Anaconda's numpy build, not the PyPI wheel
+(checked on macOS arm64).
+
 `make data` prints the split sizes. The digits dataset ships inside scikit-learn, so nothing is
 downloaded.
 

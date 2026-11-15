@@ -1,8 +1,13 @@
 PYTHON ?= python
-.PHONY: install data run test lint clean
+.PHONY: install install-locked data run test lint clean
 
 install:  ## install the package with dev extras (PyTorch CPU is used only as the reference)
 	$(PYTHON) -m pip install -e ".[dev]"
+
+# Exact package versions that produced the committed reports/ (see requirements.lock).
+install-locked:
+	$(PYTHON) -m pip install -r requirements.lock
+	$(PYTHON) -m pip install -e . --no-deps
 
 data:  ## load_digits ships inside scikit-learn: nothing to download, just print the split
 	$(PYTHON) -m tensorgrad.data
