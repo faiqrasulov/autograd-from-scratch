@@ -1,0 +1,425 @@
+{
+  "dataset": {
+    "name": "scikit-learn load_digits (UCI optdigits test set)",
+    "image_shape": [
+      1,
+      8,
+      8
+    ],
+    "n_classes": 10,
+    "n_train": 1077,
+    "n_val": 360,
+    "n_test": 360
+  },
+  "models": {
+    "mlp": {
+      "architecture": "Flatten() -> Linear(64, 128) -> ReLU() -> Linear(128, 64) -> ReLU() -> Linear(64, 10)",
+      "n_parameters": 17226,
+      "optimizer": "SGD(lr=0.05, momentum=0.9, weight_decay=0.001)",
+      "epochs": 40,
+      "batch_size": 32,
+      "optimizer_steps": 1360,
+      "float64": {
+        "tensorgrad": {
+          "test_accuracy": 0.975,
+          "test_loss": 0.12857441483656454,
+          "final_val_accuracy": 0.975,
+          "final_val_loss": 0.09905126851492783,
+          "train_time_s": 0.37
+        },
+        "pytorch": {
+          "test_accuracy": 0.975,
+          "test_loss": 0.12857441483656448,
+          "final_val_accuracy": 0.975,
+          "final_val_loss": 0.09905126851492779,
+          "train_time_s": 0.224
+        },
+        "parity": {
+          "max_abs_train_loss_diff": 1.1102230246251565e-15,
+          "max_abs_val_loss_diff": 1.1102230246251565e-16,
+          "max_abs_final_param_diff": 1.1102230246251565e-15,
+          "test_prediction_agreement": 1.0
+        }
+      },
+      "float32": {
+        "tensorgrad": {
+          "test_accuracy": 0.975,
+          "test_loss": 0.12840686738491058,
+          "final_val_accuracy": 0.975,
+          "final_val_loss": 0.09901920706033707,
+          "train_time_s": 0.213
+        },
+        "pytorch": {
+          "test_accuracy": 0.975,
+          "test_loss": 0.1285744160413742,
+          "final_val_accuracy": 0.975,
+          "final_val_loss": 0.09905128180980682,
+          "train_time_s": 0.207
+        },
+        "parity": {
+          "max_abs_train_loss_diff": 0.0007795915007591248,
+          "max_abs_val_loss_diff": 0.0003711208701133728,
+          "max_abs_final_param_diff": 0.0036515556275844574,
+          "test_prediction_agreement": 1.0
+        }
+      },
+      "seed_sweep_float64": {
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "test_accuracy": [
+          0.975,
+          0.975,
+          0.9722222222222222,
+          0.9722222222222222,
+          0.9777777777777777
+        ],
+        "mean": 0.9744444444444443,
+        "std": 0.0023240556292613125
+      }
+    },
+    "cnn": {
+      "architecture": "Conv2d(1, 16, k=3, stride=1, pad=1) -> ReLU() -> MaxPool2d(2) -> Conv2d(16, 32, k=3, stride=1, pad=1) -> ReLU() -> MaxPool2d(2) -> Flatten() -> Linear(128, 64) -> ReLU() -> Linear(64, 10)",
+      "n_parameters": 13706,
+      "optimizer": "Adam(lr=0.002, weight_decay=0.0001)",
+      "epochs": 30,
+      "batch_size": 32,
+      "optimizer_steps": 1020,
+      "float64": {
+        "tensorgrad": {
+          "test_accuracy": 0.9666666666666667,
+          "test_loss": 0.10006352868693025,
+          "final_val_accuracy": 0.9722222222222222,
+          "final_val_loss": 0.07987198980984261,
+          "train_time_s": 1.937
+        },
+        "pytorch": {
+          "test_accuracy": 0.9666666666666667,
+          "test_loss": 0.10006352868693026,
+          "final_val_accuracy": 0.9722222222222222,
+          "final_val_loss": 0.07987198980984268,
+          "train_time_s": 1.231
+        },
+        "parity": {
+          "max_abs_train_loss_diff": 1.5890067039947553e-15,
+          "max_abs_val_loss_diff": 3.885780586188048e-16,
+          "max_abs_final_param_diff": 1.4405143744511406e-14,
+          "test_prediction_agreement": 1.0
+        }
+      },
+      "float32": {
+        "tensorgrad": {
+          "test_accuracy": 0.9666666666666667,
+          "test_loss": 0.10011692345142365,
+          "final_val_accuracy": 0.9722222222222222,
+          "final_val_loss": 0.07983632385730743,
+          "train_time_s": 1.489
+        },
+        "pytorch": {
+          "test_accuracy": 0.9666666666666667,
+          "test_loss": 0.10005418956279755,
+          "final_val_accuracy": 0.9722222222222222,
+          "final_val_loss": 0.0798632949590683,
+          "train_time_s": 1.24
+        },
+        "parity": {
+          "max_abs_train_loss_diff": 2.964097075164318e-05,
+          "max_abs_val_loss_diff": 2.6971101760864258e-05,
+          "max_abs_final_param_diff": 0.0009288489818572998,
+          "test_prediction_agreement": 1.0
+        }
+      },
+      "seed_sweep_float64": {
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "test_accuracy": [
+          0.9666666666666667,
+          0.9833333333333333,
+          0.975,
+          0.9833333333333333,
+          0.9888888888888889
+        ],
+        "mean": 0.9794444444444445,
+        "std": 0.00869581991249918
+      }
+    }
+  },
+  "blas_thread_benchmark": {
+    "model": "cnn",
+    "epochs": 5,
+    "default_blas_threads": 8,
+    "train_time_s_default_threads": 0.792,
+    "train_time_s_single_thread": 0.419
+  },
+  "op_checks": {
+    "summary": {
+      "n_cases": 37,
+      "max_abs_forward_diff_vs_torch": 3.552713678800501e-15,
+      "max_abs_grad_diff_vs_torch": 3.552713678800501e-15,
+      "max_rel_err_vs_finite_diff": 5.436821903753902e-07
+    },
+    "cases": [
+      {
+        "op": "add",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 3.1941618034692842e-09
+      },
+      {
+        "op": "add (broadcast 2x3x4 + 4)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 4.440892098500626e-16,
+        "max_rel_err_vs_finite_diff": 3.1941618034692842e-09
+      },
+      {
+        "op": "sub (broadcast 3x1 - 1x4)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 1.6764807774308088e-10
+      },
+      {
+        "op": "neg",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 2.178841054726451e-09
+      },
+      {
+        "op": "mul (broadcast 2x3x4 * 3x1)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 2.220446049250313e-16,
+        "max_rel_err_vs_finite_diff": 1.3043429840083592e-09
+      },
+      {
+        "op": "div (broadcast 3x4 / 4)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 2.220446049250313e-16,
+        "max_rel_err_vs_finite_diff": 1.684269316244285e-09
+      },
+      {
+        "op": "scalar ops (2*x - x/3 + 1, 1/x)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 4.440892098500626e-16,
+        "max_rel_err_vs_finite_diff": 2.3335863094775758e-09
+      },
+      {
+        "op": "pow (x**2)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 1.0948686118321715e-09
+      },
+      {
+        "op": "pow (x**-1.5)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 8.881784197001252e-16,
+        "max_rel_err_vs_finite_diff": 6.384431646511852e-10
+      },
+      {
+        "op": "matmul (2-D)",
+        "max_abs_forward_diff_vs_torch": 1.1102230246251565e-16,
+        "max_abs_grad_diff_vs_torch": 2.220446049250313e-16,
+        "max_rel_err_vs_finite_diff": 4.6115527871501346e-09
+      },
+      {
+        "op": "matmul (batched, broadcast)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 4.440892098500626e-16,
+        "max_rel_err_vs_finite_diff": 1.466406338476688e-08
+      },
+      {
+        "op": "matmul (vector @ matrix)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 1.1102230246251565e-16,
+        "max_rel_err_vs_finite_diff": 1.3354812015392514e-09
+      },
+      {
+        "op": "exp",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 6.1499141420840085e-09
+      },
+      {
+        "op": "log",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 3.196645235421441e-10
+      },
+      {
+        "op": "sum (all)",
+        "max_abs_forward_diff_vs_torch": 1.1102230246251565e-16,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 6.36515048077912e-11
+      },
+      {
+        "op": "sum (axis=(0, 2))",
+        "max_abs_forward_diff_vs_torch": 4.440892098500626e-16,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 4.979746841952451e-10
+      },
+      {
+        "op": "sum (axis=1, keepdims)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 3.4243572700188714e-10
+      },
+      {
+        "op": "mean (all)",
+        "max_abs_forward_diff_vs_torch": 6.938893903907228e-18,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 7.399942327111785e-11
+      },
+      {
+        "op": "mean (axis=-1)",
+        "max_abs_forward_diff_vs_torch": 1.1102230246251565e-16,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 1.0018602760554886e-09
+      },
+      {
+        "op": "max (all)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 4.6725997807678246e-11
+      },
+      {
+        "op": "max (axis=1)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 9.181798903235283e-10
+      },
+      {
+        "op": "max (axis=0, keepdims)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 1.0191474912455036e-10
+      },
+      {
+        "op": "reshape",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 1.8297849282883747e-08
+      },
+      {
+        "op": "transpose (permute 2,0,1)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 7.437395204232698e-10
+      },
+      {
+        "op": "getitem (slices + None)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 5.519897829962711e-10
+      },
+      {
+        "op": "getitem (negative step, int)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 1.3233312433503342e-10
+      },
+      {
+        "op": "relu",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 1.639649896692596e-10
+      },
+      {
+        "op": "tanh",
+        "max_abs_forward_diff_vs_torch": 5.551115123125783e-17,
+        "max_abs_grad_diff_vs_torch": 5.551115123125783e-17,
+        "max_rel_err_vs_finite_diff": 2.386874521894978e-09
+      },
+      {
+        "op": "sigmoid",
+        "max_abs_forward_diff_vs_torch": 2.220446049250313e-16,
+        "max_abs_grad_diff_vs_torch": 5.551115123125783e-17,
+        "max_rel_err_vs_finite_diff": 2.0493866417611362e-08
+      },
+      {
+        "op": "log_softmax (axis=-1)",
+        "max_abs_forward_diff_vs_torch": 4.440892098500626e-16,
+        "max_abs_grad_diff_vs_torch": 1.1102230246251565e-16,
+        "max_rel_err_vs_finite_diff": 6.961136611046866e-09
+      },
+      {
+        "op": "log_softmax (axis=0)",
+        "max_abs_forward_diff_vs_torch": 4.440892098500626e-16,
+        "max_abs_grad_diff_vs_torch": 1.1102230246251565e-16,
+        "max_rel_err_vs_finite_diff": 2.0213099184723e-09
+      },
+      {
+        "op": "cross_entropy (mean)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 3.469446951953614e-18,
+        "max_rel_err_vs_finite_diff": 3.2486124812598857e-09
+      },
+      {
+        "op": "cross_entropy (sum)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 1.3877787807814457e-17,
+        "max_rel_err_vs_finite_diff": 1.3144070715680737e-09
+      },
+      {
+        "op": "conv2d (stride 1, pad 1, bias)",
+        "max_abs_forward_diff_vs_torch": 3.552713678800501e-15,
+        "max_abs_grad_diff_vs_torch": 3.552713678800501e-15,
+        "max_rel_err_vs_finite_diff": 5.436821903753902e-07
+      },
+      {
+        "op": "conv2d (stride 2, no pad, no bias)",
+        "max_abs_forward_diff_vs_torch": 1.7763568394002505e-15,
+        "max_abs_grad_diff_vs_torch": 1.9984014443252818e-15,
+        "max_rel_err_vs_finite_diff": 2.3063687968041113e-08
+      },
+      {
+        "op": "max_pool2d (2x2, stride 2)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 0.0,
+        "max_rel_err_vs_finite_diff": 3.1941618034692842e-09
+      },
+      {
+        "op": "max_pool2d (3x3, stride 1, overlapping)",
+        "max_abs_forward_diff_vs_torch": 0.0,
+        "max_abs_grad_diff_vs_torch": 2.220446049250313e-16,
+        "max_rel_err_vs_finite_diff": 3.910749878851513e-10
+      }
+    ]
+  },
+  "nnpack_ablation": {
+    "torch_nnpack_available": true,
+    "float32_cnn_parity_with_nnpack": {
+      "max_abs_train_loss_diff": 0.02915056049823761,
+      "max_abs_val_loss_diff": 0.014836065471172333,
+      "max_abs_final_param_diff": 0.2581022381782532,
+      "test_prediction_agreement": 1.0
+    },
+    "abs_loss_diff_after_first_step_with_nnpack": 0.0008280277252197266,
+    "first_batch_max_abs_grad_error_vs_float64": {
+      "tensorgrad_float32": 1.335199514562735e-07,
+      "pytorch_float32_nnpack_on": 0.04589196919463101,
+      "pytorch_float32_nnpack_off": 1.3290095157714177e-07
+    },
+    "probe_images": 32,
+    "conv1_exact_zero_outputs": 4944,
+    "of_which_nonzero_in_torch_nnpack": 3696,
+    "of_which_positive_in_torch_nnpack": 1824,
+    "conv1_max_abs_output_diff_nnpack": 8.097849786281586e-06,
+    "conv1_max_abs_output_diff_nnpack_off": 0.0
+  },
+  "environment": {
+    "tensorgrad": "0.1.0",
+    "python": "3.12.4",
+    "numpy": "1.26.4",
+    "torch": "2.10.0",
+    "machine": "Darwin arm64",
+    "threads": "1 (BLAS and torch)",
+    "torch_nnpack_in_parity_runs": false
+  }
+}
