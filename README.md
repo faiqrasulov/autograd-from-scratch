@@ -112,8 +112,8 @@ images, no download), with pixels scaled to [0, 1].
   decay 1e-3) for 40 epochs. A CNN with two blocks of [conv 3×3 → ReLU → max-pool 2×2] (16 then
   32 channels), followed by 128→64→10 dense layers, trained with Adam (lr 2e-3, weight decay
   1e-4) for 30 epochs. Both use batch size 32.
-- **Hyperparameters** were chosen by validation loss from about ten short runs; selection never
-  looked at test accuracy.
+- **Hyperparameters** are fixed in `cli.py` and are not tuned by `make run`; the search that
+  produced them is not recorded in this repo.
 - **Parity:** each configuration is trained twice, once by tensorgrad and once by PyTorch. Both
   runs start from the same Kaiming-initialized weights and use a shared, pre-computed batch
   schedule. Both run in float64 and in float32.
