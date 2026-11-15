@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tensorgrad"
+version = "0.1.0"
+description = "A small reverse-mode autodiff engine and neural-network library in pure NumPy, verified op-by-op against PyTorch."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Faiq Rasulov" }]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "scikit-learn>=1.2",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+# PyTorch is only the reference implementation for parity tests and the parity experiment.
+parity = ["torch>=2.0"]
+dev = [
+    "torch>=2.0",
+    "pytest>=7.4",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+tensorgrad-run = "tensorgrad.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "NPY"]
+ignore = ["N802", "N803", "N806", "N812"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = ["error::RuntimeWarning"]
