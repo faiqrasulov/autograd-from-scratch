@@ -26,7 +26,7 @@ BackwardFn = Callable[[np.ndarray], Sequence[np.ndarray | None]]
 
 @contextmanager
 def no_grad():
-    """Context manager that disables graph construction (inference, optimizer updates)."""
+    """Context manager that disables graph construction (inference and evaluation)."""
     global _grad_enabled
     previous = _grad_enabled
     _grad_enabled = False

@@ -26,6 +26,7 @@ import numpy as np
 from threadpoolctl import threadpool_info, threadpool_limits
 
 from . import __version__
+from . import functional as F
 from .data import Splits, batch_schedule, load_digit_splits
 from .models import MODELS
 from .parity import op_report, require_torch, to_torch
@@ -79,33 +80,67 @@ def blas_thread_benchmark(data: Splits, cfg: TrainConfig, epochs: int = 5) -> di
             "train_time_s_single_thread": round(t_single, 3)}
 
 
+def _first_batch_grads(
+    data: Splits, cfg: TrainConfig, seed: int, framework: str, dtype: Any
+) -> dict[str, np.ndarray]:
+    """Parameter gradients of the initial CNN on the first scheduled training batch."""
+    idx = batch_schedule(len(data.y_train), 1, cfg.batch_size, seed)[0][0]
+    x, y = data.X_train[idx].astype(dtype), data.y_train[idx]
+    model = MODELS["cnn"](seed=seed)
+    if framework == "tensorgrad":
+        model.to(dtype)
+        F.cross_entropy(model(Tensor(x)), y).backward()
+        return {k: p.grad.astype(np.float64) for k, p in model.named_parameters()}
+    torch = require_torch()
+    tmodel = to_torch(model, dtype)
+    torch.nn.functional.cross_entropy(tmodel(torch.from_numpy(x)), torch.from_numpy(y)).backward()
+    return {k: p.grad.double().numpy() for k, p in tmodel.named_parameters()}
+
+
 def nnpack_ablation(data: Splits, cfg: TrainConfig, seed: int) -> dict[str, Any]:
     """Float32 CNN parity with PyTorch's NNPACK conv backend switched back on.
 
-    PyTorch routes float32 CPU convolutions with batch >= 16 and grad mode on (i.e. training)
-    to NNPACK, whose fast algorithm returns tiny non-zero values where the exact result is 0
-    (blank image regions times zero-initialised bias). ReLU then passes gradient where it should
-    not, and the two training runs drift apart from the first step.
+    In the PyTorch build measured here, float32 CPU convolutions with batch >= 16 and autograd
+    enabled are dispatched to NNPACK, whose fast algorithm returns tiny non-zero values where the
+    exact result is 0 (blank image regions times zero-initialised bias). ReLU then passes
+    gradient where it should not, and the two training runs drift apart from the first step.
     """
     torch = require_torch()
+    ref = _first_batch_grads(data, cfg, seed, "tensorgrad", np.float64)  # float64 reference
+
+    def grad_error(framework: str) -> float:
+        grads = _first_batch_grads(data, cfg, seed, framework, np.float32)
+        return max(float(np.abs(grads[k] - ref[k]).max()) for k in ref)
+
+    model = MODELS["cnn"](seed=seed).to(np.float32)  # initial weights: zero bias
+    x = data.X_train[:cfg.batch_size].astype(np.float32)
+    exact = model[0](Tensor(x)).data
+    tconv = to_torch(model, np.float32)[0]
     with torch.backends.nnpack.flags(enabled=True):
         h_tg, h_pt, _ = train_pair("cnn", data, cfg, seed, np.float32)
-        model = MODELS["cnn"](seed=seed).to(np.float32)  # initial weights: zero bias
-        x = data.X_train[:cfg.batch_size].astype(np.float32)
-        exact = model[0](Tensor(x)).data
-        tconv = to_torch(model, np.float32)[0]
-        fast = tconv(torch.from_numpy(x)).detach().numpy()  # grad mode, batch >= 16 -> NNPACK
+        fast = tconv(torch.from_numpy(x)).detach().numpy()  # autograd on, batch >= 16
+        err_nnpack = grad_error("pytorch")
     with torch.backends.nnpack.flags(enabled=False):
         direct = tconv(torch.from_numpy(x)).detach().numpy()
+        err_direct = grad_error("pytorch")
     zeros = exact == 0
-    return {"torch_nnpack_available": bool(torch.backends.nnpack.is_available()),
-            "float32_cnn_parity_with_nnpack": parity_stats(h_tg, h_pt),
-            "probe_images": len(x),
-            "conv1_exact_zero_outputs": int(zeros.sum()),
-            "of_which_nonzero_in_torch_nnpack": int((fast[zeros] != 0).sum()),
-            "of_which_positive_in_torch_nnpack": int((fast[zeros] > 0).sum()),
-            "conv1_max_abs_output_diff_nnpack": float(np.abs(exact - fast).max()),
-            "conv1_max_abs_output_diff_nnpack_off": float(np.abs(exact - direct).max())}
+    return {
+        "torch_nnpack_available": bool(torch.backends.nnpack.is_available()),
+        "float32_cnn_parity_with_nnpack": parity_stats(h_tg, h_pt),
+        "abs_loss_diff_after_first_step_with_nnpack":
+            abs(h_tg.train_loss[1] - h_pt.train_loss[1]),
+        "first_batch_max_abs_grad_error_vs_float64": {
+            "tensorgrad_float32": grad_error("tensorgrad"),
+            "pytorch_float32_nnpack_on": err_nnpack,
+            "pytorch_float32_nnpack_off": err_direct,
+        },
+        "probe_images": len(x),
+        "conv1_exact_zero_outputs": int(zeros.sum()),
+        "of_which_nonzero_in_torch_nnpack": int((fast[zeros] != 0).sum()),
+        "of_which_positive_in_torch_nnpack": int((fast[zeros] > 0).sum()),
+        "conv1_max_abs_output_diff_nnpack": float(np.abs(exact - fast).max()),
+        "conv1_max_abs_output_diff_nnpack_off": float(np.abs(exact - direct).max()),
+    }
 
 
 def _op_checks() -> dict[str, Any]:
